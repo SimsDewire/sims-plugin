@@ -1,7 +1,6 @@
 /// <reference path="typings/ue.d.ts">/>
 
 "use strict"
-
 // Blueprint class can be subclassed!
 class MyActor extends Blueprint.Load('/Game/barChart').GeneratedClass {
     // constructor
@@ -18,8 +17,8 @@ class MyActor extends Blueprint.Load('/Game/barChart').GeneratedClass {
         this.Position/*EditAnywhere+Vector[]*/;
         this.Some/*EditAnywhere+DistanceDatum*/;
     }
-	
-	
+    
+    
 
     // Overriding function doesn't need function signature
     ReceiveBeginPlay() {
@@ -27,20 +26,20 @@ class MyActor extends Blueprint.Load('/Game/barChart').GeneratedClass {
 
         console.log("barchart beginplay()")
     }
-	
-	updateValue(value){
-		console.log("in set value")
-		super.setValue(value)
-	}
-	
-	/* Takes an array of values and passes them to super.SetValues
-		@param values Array of float values
-	*/
-	updateValues(values){
-		
-		console.log("in update values");
-		super.setValues(values)
-	}
+    
+    updateValue(value){
+        console.log("in set value")
+        super.setValue(value)
+    }
+    
+    /* Takes an array of values and passes them to super.SetValues
+        @param values Array of float values
+    */
+    updateValues(values){
+        
+        console.log("in update values");
+        super.setValues(values)
+    }
     
     //Tick(){
         //console.log("ticking")
@@ -58,7 +57,9 @@ class MyActor extends Blueprint.Load('/Game/barChart').GeneratedClass {
 }
 
 
-let MyActor_C = require('uclass')()(global,MyActor)
+// Compile classes
+const uclass = require('uclass')().bind(this,global);
+let MyActor_C = uclass(MyActor);
 
 let _ = require('lodash')
 
@@ -66,17 +67,25 @@ function GetPC() {
     return GWorld.GetAllActorsOfClass(PlayerController).OutActors[0]
 }
 
-
+function getPluginActors() {
+    return {
+        "Barchart": {
+            actor: MyActor_C,
+            description: "A nice barchart that display important information about an important server status",
+            thumbnail: "thumbnail.png"
+        }
+    };
+}
 function main() {
     if (GWorld.IsServer()) {
         let actor = new MyActor_C(GWorld,{Y:100})
         
         //  Set interval for actor.update to update once every sec
-		//		Randomly passes number between 1 and 10 as value
+        //      Randomly passes number between 1 and 10 as value
         setInterval(function(){actor.updateValues(dummyArray())}, 1000)
-		
-		//actor.updateValue(10.5)
-		
+        
+        //actor.updateValue(10.5)
+        
         return function () {
             actor.DestroyActor()
             
@@ -87,11 +96,15 @@ function main() {
 }
 
 function dummyArray(){
-	return new Array(5).map(function(){return Math.floor((Math.random() * 10) + 1)})
+    return new Array(5).map(function(){return Math.floor((Math.random() * 10) + 1)})
 }
-
+var options = {};
+GWorld.exports =  {};
+GWorld.exports.options = options;
+GWorld.exports.getPluginActors = getPluginActors;
+/*
 module.exports = () => {
     let cleanup = null;
     process.nextTick(() => cleanup = main());
     return () => cleanup();
-}
+}*/
