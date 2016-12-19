@@ -3,6 +3,7 @@
 "use strict"
 try {
 const network = require('request');
+console.log("dasdasdasd");
 // class PieChartClass extends Root.ResolveClass('BP_Pie_chart') {
 class PieChartClass extends Blueprint.Load('/Game/StandardGraphs/PieChart/Blueprints/BP_Pie_chart').GeneratedClass {
     Properties() {
@@ -10,25 +11,33 @@ class PieChartClass extends Blueprint.Load('/Game/StandardGraphs/PieChart/Bluepr
         this.timeDelay/*EditAnywhere+int*/
     }
     ReceiveBeginPlay() {
+        console.log("HGds");
         super.ReceiveBeginPlay();
         this.DoUpdateValues = true;
-        this.timeDelay = 3000;
+        this.timeDelay = 10;
         this.UpdateValuesLoop();
     }
     UpdateValuesLoop(values) {
         if(!this.DoUpdateValues) return false;
         var self = this;
-        this.UpdateValues(values || []).then(function(response) {
+        this.UpdateValues(values || [1]).then(function(response) {
             setTimeout(function() {
                 if(!self.DoUpdateValues) return false;
-                self.UpdateValuesLoop([2, response.Test]);
+                // self.UpdateValuesLoop(response);
+                console.log(response);
+                self.UpdateValuesLoop([1 - response.Test/1000, response.Test/1000]);
             }, self.timeDelay);
         });
         return true;
     }
     UpdateValues(values) {
         this.UpdatePieChartData(values); // Where values should be an array of numbers like: [1, 43, 134, 54, 13...]
-        return network('GET', 'http://192.168.1.110:3002/test/linear');
+        // return network('GET', '127.0.0.1:3002/test/exp');
+        return GWorld.Network('GET', '127.0.0.1:3002/test/exp');
+        // return {then: function(f) {f(dummyArray());}}
+    }
+    Destroyed() {
+        this.DoUpdateValues = false;
     }
 }
 
