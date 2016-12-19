@@ -12,23 +12,27 @@ class PieChartClass extends Blueprint.Load('/Game/StandardGraphs/Barchart/Histor
     ReceiveBeginPlay() {
         super.ReceiveBeginPlay();
         this.DoUpdateValues = true;
-        this.timeDelay = 3000;
+        this.timeDelay = 2000;
         this.UpdateValuesLoop();
     }
     UpdateValuesLoop(values) {
         if(!this.DoUpdateValues) return false;
         var self = this;
-        this.UpdateValues(values || []).then(function(response) {
+        this.UpdateValues(values || [1]).then(function(response) {
             setTimeout(function() {
                 if(!self.DoUpdateValues) return false;
-                self.UpdateValuesLoop([2, response.Test]);
+                self.UpdateValuesLoop([response.Test]);
             }, self.timeDelay);
         });
         return true;
     }
     UpdateValues(values) {
         this.UpdategraphData(values); // Where values should be an array of numbers like: [1, 43, 134, 54, 13...]
-        return network('GET', 'http://192.168.1.110:3002/test/linear');
+        return GWorld.Network('GET', '127.0.0.1:3002/test/exp');
+        // return network('GET', '127.0.0.1:3002/test/exp');
+    }
+    Destroyed() {
+        this.DoUpdateValues = false;
     }
 }
 
